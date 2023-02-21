@@ -10,6 +10,8 @@
   axios.post('http://localhost:3000/user/login',loginDetails)
   .then(response => {
     alert(response.data.message)
+    console.log(response.data)
+    localStorage.setItem('token',response.data.token)
     window.location.href = "../ExpenseTracker/index.html"
   }).catch(err => {
     console.log(JSON.stringify(err))
@@ -17,3 +19,4 @@
   })
 
 }
+

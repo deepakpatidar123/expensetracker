@@ -4,7 +4,8 @@ function addNewExpense(e){
     const expenseDetails = {
         expenseamount: e.target.expenseamount.value,
         category: e.target.category.value,
-        description: e.target.description.value
+        description: e.target.description.value,
+        userId:1
     }
     console.log(expenseDetails)
     axios.post('http://localhost:3000/expense/addexpense',expenseDetails)
@@ -43,6 +44,7 @@ function addNewExpensetoUI(expense){
 }
 
 function deleteExpense(e, expenseid){
+    const token = localStorage.getItem('token')
     axios.delete(`http://localhost:3000/expense/deleteexpense/${expenseid}`).then((response)=> {
 
          removeExpensefromUI(expenseid);

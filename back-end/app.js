@@ -17,6 +17,9 @@ app.use(bodyParser.json())
 app.use(userRoutes)
 app.use(expenseRoutes)
 
+User.hasMany(Expense);
+Expense.belongsTo(User);
+
 sequelize.sync()
 .then((res)=>{
     //console.log(res)
