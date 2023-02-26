@@ -37,6 +37,7 @@ exports.postLogin = async(req, res, next) => {
         if (isstringinvalid(email) || isstringinvalid(password)){
             return res.status(400).json({message:"Email or Password is missing!!"})
         }
+        console.log(password);
         const user = await User.findAll({ where: {email}})
         if(user.length > 0){
             bcrypt.compare(password, user[0].password, (err, result) => {
