@@ -7,13 +7,24 @@ const addexpense = (req, res) => {
         return res.status(400).json({success: false, message: 'Parameters missing'})
     }
 
-    Expense.create({expenseamount,category,description,userId}).then(expense => {
-        return res.status(201).json({expense, success: true });
-    }).catch(err => {
-        return res.status(500).json({success : false, error: err})
-    })
-}
+    Expense.create({expenseamount,category,description,userId: req.user.id}).then(expense => {
+    const totalExpense = Number(re.user.totalExpenses) + Number(expenseamount)
+    console.log(totalExpense)
+    User.update({
+        totalExpenses: totalExpense
+    },{
+        where: {id: req.user.id}
+    }).then(async() => {
+       res.status(200).json({expense: expense})
+})
+.catch(async(err) => {
+    return res.status(500).json({success : false, error:err})
+})
 
+}).catch(async(err) => {
+    return res.status(500).json({success : false, error: err})
+})
+}
 const getexpense = (req, res)=> {
     
  Expense.findAll().then(expense => {
