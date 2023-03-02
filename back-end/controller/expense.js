@@ -1,33 +1,60 @@
 const Expense = require('../models/expense');
+const User = require('../models/user')
+const sequelize = require('../util/database');
 
-const addexpense = (req, res) => {
-   
-    const { expenseamount,category, description } = req.body;
-    if(expenseamount == undefined || expenseamount.length === 0){
-        return res.status(400).json({success: false, message: 'Parameters missing'})
+const addexpense = async(req, res) => {
+//     const t = await sequelize.transaction();
+//     try{
+//     const { expenseamount,category, description } = req.body;
+
+
+//     if(expenseamount == undefined || expenseamount.length === 0){
+//         return res.status(400).json({success: false, message: 'Parameters missing'})
+//     }
+
+//    const expense = await Expense.create({expenseamount,category,description,userId: req.user.id}, {transaction: t}).then(expense => {
+//     const totalExpense = Number(re.user.totalExpenses) + Number(expenseamount)
+    
+//    await User.update({
+//         totalExpenses: totalExpense
+//     },{
+//         where: {id: req.user.id},
+//         transaction: t
+//     })
+//        await t.commit();
+//        res.status(200).json({expense: expense})
+//    })
+
+// }catch(err) {
+//   await t.rollback();
+//     return res.status(500).json({success : false, error: err})
+// }
+const t = await seqeilize.transaction();
+   try{
+    const {expenseamount, description, category} = req.body;
+
+    if(expenseamount== undefined || expenseamount.length==0){
+        return res.status(400).json({seccess: false, message:'parameter is missing'})
     }
-
-    Expense.create({expenseamount,category,description,userId: req.user.id}).then(expense => {
-    const totalExpense = Number(re.user.totalExpenses) + Number(expenseamount)
-    console.log(totalExpense)
-    User.update({
-        totalExpenses: totalExpense
-    },{
-        where: {id: req.user.id}
-    }).then(async() => {
-       res.status(200).json({expense: expense})
-})
-.catch(async(err) => {
-    return res.status(500).json({success : false, error:err})
-})
-
-}).catch(async(err) => {
-    return res.status(500).json({success : false, error: err})
-})
+    const expense = await Expense.create({expenseamount, description, category,userId: req.user.id }, {transaction: t })
+    const totalExpense = Number(req.user.totalExpenses)+ Number(expenseamount) 
+    await User.update({
+         totalExpenses: totalExpense
+      },{
+            where : {id:req.user.id},
+            transaction: t
+        })
+         await t.commit();
+         res.status(200).json({expense:expense})
+        
+    } catch(err){
+        await t.rollback();
+        return res.status(500).json({success:false, error:err})
+     }
 }
 const getexpense = (req, res)=> {
     
- Expense.findAll().then(expense => {
+ Expense.findAll({where :{userId: req.user.id}}).then(expense => {
     return res.status(200).json({expense, success: true})
   })
   .catch(err => {
@@ -37,7 +64,6 @@ const getexpense = (req, res)=> {
     
 }
 const deleteexpense = (req,res)=> {
-    try{
     const expenseid = req.params.expenseid;
     if(expenseid == undefined || expenseid.length === 0){
      return   res.status(400).json({success: false, })
@@ -51,8 +77,7 @@ const deleteexpense = (req,res)=> {
         console.log(err);
         return res.status(500).json({ success: true, message: "Failed"})
     })
-}catch(err){
-    res.status(500).json({message: err, success: false})
+
 }
-}
-module.exports = {addexpense,getexpense,deleteexpense}
+
+        module.exports = {addexpense,getexpense,deleteexpense}
