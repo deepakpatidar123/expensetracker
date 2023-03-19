@@ -1,31 +1,38 @@
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')
 
-const sequelize = require('./util/database')
-const userRoutes = require('./routes/user')
-const expenseRoutes = require('./routes/expense')
-const purchaseRoutes = require('./routes/purchase')
-const premiumFeatureRoutes = require('./routes/premiumFeature')
-const resetPasswordRoutes = require('./routes/resetpassword')
+const express = require('express');
+const bodyParser = require('body-parser');
+const sequelize = require('./util/database');
+const compression = require('compression');
+require('dotenv').config()
 
-const User = require('./models/user')
-const Expense = require('./models/expense')
-const Order = require('./models/orders')
+const app = express();
+
+const cors = require('cors');
+const helmet = require('helmet');
+app.use(cors());
+//app.use(helmet());
+//app.use(compression());
+
+const User = require('./models/user');
+const Expense = require('./models/expense');
+const Order = require('./models/order');
 const Forgotpassword = require('./models/forgotpassword');
+const DownloadedFile = require('./models/downlededFile');
 
-const app = express()
+const userRoutes = require('./routes/user');
+const expenseRoutes= require('./routes/expense');
+const purchaseRoute = require('./routes/purchase');
+const resetpasswordRoute = require('./routes/resetpassword');
+const premiumFeatureRoute = require('./routes/premiumFeature');
 
- 
-app.use(cors())
-// app.use(bodyParser.json())
-app.use(express.json());
+app.use(bodyParser.json({ extended: false }));
+//app.use(bodyParser.json)
 
-app.use(userRoutes)
-app.use(expenseRoutes)
-app.use(purchaseRoutes)
-app.use(premiumFeatureRoutes)
-app.use( resetPasswordRoutes);
+app.use(userRoutes);
+app.use(expenseRoutes);
+app.use(purchaseRoute);
+app.use(premiumFeatureRoute );
+app.use('/password',resetpasswordRoute);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
@@ -36,9 +43,11 @@ Order.belongsTo(User);
 User.hasMany(Forgotpassword);
 Forgotpassword.belongsTo(User);
 
-sequelize.sync()
 
-.then((res)=>{
-    //console.log(res)
-    app.listen(3000)
-}).catch(err=>console.log(err))
+sequelize
+//  .sync({force: true})
+ .sync()
+ .then(result =>{
+    app.listen(3000);
+ })
+ .catch(err => console.log(err));

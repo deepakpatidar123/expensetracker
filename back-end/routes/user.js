@@ -1,11 +1,16 @@
+
 const express = require('express');
 
-const userController = require('../controller/user')
+const userController = require('../controllers/user');
+const userauthentication= require('../middleware/auth');
+const expenseController = require('../controllers/expense');
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/user/signup', userController.postSignup)
-router.post('/user/login', userController.postLogin)
+router.post('/user/signup', userController.postSignup);
 
+router.post('/user/login',userController.postLogin);
 
-module.exports = router
+router.get('/user/download',userauthentication.authenticate, expenseController.downloadExpense )
+
+module.exports = router;
